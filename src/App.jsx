@@ -5,6 +5,8 @@ function App() {
 
   const [task,settask] = useState("")
   const [tasks,settasks] = useState([])
+  const [editIndex,seteditIndex] = useState(null)
+  const [editText,seteditText] = useState("")
 
   function handleChange(e){
     settask(e.target.value)
@@ -34,6 +36,25 @@ function App() {
 
   }
 
+  function handleEdit(index){
+    seteditIndex(index);
+    seteditText(tasks[index].text)
+  }
+
+  function handleSave(index) {
+    const updatedTasks = tasks.map((t, i) =>
+      i === index ? { ...t, text: editText } : t
+    );
+    settasks(updatedTasks);
+    seteditIndex(null);
+    seteditText("");
+  }
+
+  function handleCancel() {
+    seteditIndex(null);
+    seteditText("");
+  }
+
   
   return (
     
@@ -56,14 +77,44 @@ function App() {
             <li key={index} 
           className="text-3xl bg-blue-100 m-4 p-2 px-4 rounded-2xl relative flex justify-between items-start "
           >
-            <p className={`whitespace-normal break-words w-[75%] ${
+            { editIndex === index ? (
+              <div className="flex flex-col w-[75%]">
+                <input
+                  type="text"
+                  value={editText}
+                  className="border p-2 rounded-lg text-xl"
+                  onChange={(e) => seteditText(e.target.value)}
+                />
+                <div className="flex gap-2 mt-2">
+                  <button
+                    className="bg-green-500 p-2 px-4 rounded-3xl cursor-pointer"
+                    onClick={() => handleSave(index)}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="bg-gray-500 p-2 px-4 rounded-3xl cursor-pointer"
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+
+            ):(
+              <>
+              <p className={`whitespace-normal break-words w-[75%] ${
                 task.completed ? "line-through text-gray-500" : ""
               }`} >{task.text}</p> 
 
             <div className="text-xs flex gap-x-2">
               <button className="bg-blue-500 p-2 px-4 rounded-3xl cursor-pointer" onClick={() => handleCheck(index)} >{task.completed ?'uncheck' :'check'}</button>
+              <button className="bg-blue-500 p-2 px-4 rounded-3xl cursor-pointer" onClick={() => handleEdit(index)}>edit</button>
               <button className="bg-blue-500 p-2 px-4 rounded-3xl cursor-pointer" onClick={() => handleDelete(index)}>Delete</button>
             </div>
+              </>
+            )
+            }
             
             </li> 
         ))
